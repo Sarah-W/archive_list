@@ -38,7 +38,7 @@
           <p>{document.fulltext}</p>
         </div>
       {/if}  
-      <p><a target=_blank href={document.landing_url}>{document.landing_url}</a></p>
+      <p class = link><a target=_blank href={document.landing_url}>{document.landing_url}</a></p>
       <p>Available date fields</p>
       <ul>
         {#each datefields as datefield}
@@ -62,6 +62,7 @@
 
 
 <style lang="scss">
+
   .entry{
     display: flex;
     gap:10px;
@@ -101,4 +102,41 @@
   div.doc{
     border: solid thin grey;
   }
+
+  @media only screen and (max-width: 500px) {
+  
+    .guts{
+      border: solid thin grey;
+      display:flex;
+      flex-direction: column;
+      margin:5px;
+      .pic{
+        display:flex;
+        justify-content: space-around;
+        max-width: 100%;
+        padding:3px;
+        border: solid thin grey;
+        img{
+          max-width: 100%;
+        }
+      }
+      .meta{
+        // width:100%;
+        padding-left:5px;
+        p.link{
+          width:95%;
+            overflow:hidden;
+            white-space: nowrap;
+            text-overflow:ellipsis;
+        }
+      }
+    }
+    button{
+      width:100%;
+      height:30px;
+    }
+
+  }
+
+
 </style>

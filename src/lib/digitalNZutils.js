@@ -1,4 +1,3 @@
-const digitalnz=`https://api.digitalnz.org/v3/records.json`
 
 let categories = [
   "Newspapers", 
@@ -19,16 +18,6 @@ let categories = [
   "Websites", 
   "Sets"
 ]
-
-// const primaryCollections = async (category="",page=0)=>{
-//   let url = `${digitalnz}?&facets=primary_collection&facets_per_page=350&facets_page=${page+1}`
-//   if(category){url=url+`&and[category][]=${category}`}
-//  let resp = fetch(url)
-//   .then(response => response.json())
-//   // .then(d=>{console.log(d.search.facets.primary_collection);return d})
-//   .then(d => Object.keys(d.search.facets.primary_collection))
-//   return await resp
-// }
 
 const primaryCollections = async (category="",page=0)=>{
   let search = `?&facets=primary_collection&facets_per_page=350&facets_page=${page+1}`
@@ -55,7 +44,6 @@ const searchByCategory = async (category='Newspapers')=>{
     .then(response => response.json())
   return await resp
 }
-
 
 const searchWithParams = async (/** @type {object} */ searchparams)=>{
   const defaultparams={

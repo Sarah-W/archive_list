@@ -106,11 +106,34 @@
 
 <style lang="scss">
 
+@media only screen and (max-width: 500px) {
+  .container{
+    display: flex;
+    flex-direction: column;
+    width:100%;
+    margin:5px;
+  }
+
+  .sidebar{
+    width:100%;
+  }
+  .results{
+    overflow-x: scroll;
+    flex-basis: 100%;
+  }
+  button{
+      width:100%;
+      height:30px;
+      margin-top: 15px;
+    }
+
+}
+
+@media only screen and (min-width: 500px) {
   .container{
     display: flex;
     width:80%;
     margin:auto;
-
   }
 
   div{
@@ -124,7 +147,7 @@
     overflow-x: scroll;
     flex-basis: 80%;
   }
-
+}
 
   fieldset{
       border-radius:4px;
@@ -162,6 +185,11 @@
       margin-bottom: 3px;
       font-size: small;
     }
+        button{
+      width:100%;
+      height:30px;
+    }
+
   }    
 
 </style>
