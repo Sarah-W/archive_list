@@ -6,10 +6,14 @@
     categories,
     primaryCollections
   } from '$lib/digitalNZutils.js'
+  import DisplayDoc from '$lib/DisplayDoc.svelte'
+  import PrettyDoc from '$lib/PrettyDoc.svelte'
 
   let category=""
   let primary_collection=""
   let text = ""
+
+  // $:console.log({category,primary_collection,text})
 
   $: searchparams ={
     category,
@@ -17,7 +21,14 @@
     text
   }
 
+ let updateCollections = (/** @type {any} */ collections)=>{
+  // if(!collections.find(d=>d==primary_collection)){primary_collection=""}
+  primary_collection=""
+  return collections
+ }
+
   $:collections = primaryCollections(category)
+    .then(updateCollections)
 
  let results = new Promise(()=>{})
 
@@ -26,7 +37,11 @@
   console.log(await results)
  }
 
-
+ const enter = (e) => {
+		if (e.code == 'Enter') {
+			search();
+		}
+	};
 
 </script>
 
@@ -69,6 +84,7 @@
             id="term"
             bind:value={text}
             label="term"
+            on:keypress={enter}
           />
         </div>
         <button on:click={search}>Go!</button>
@@ -79,10 +95,10 @@
   <div class = results>
     <h1>A list of docs</h1>
     {#await results then docs}
-      {#each docs.search.results as doc}
-        <p>{doc.title}</p>
-        <pre>{JSON.stringify(doc,null,2)}</pre>
-        
+      {#each docs.search.results as document}
+       <!-- <DisplayDoc {document}> -->
+       <!-- </DisplayDoc> -->
+       <PrettyDoc {document}></PrettyDoc>
       {/each}
     {/await}
   </div>
@@ -120,7 +136,7 @@
   .input{
     display: flex;
     flex-direction: column;
-    input,select{
+    select{
       font-size: large;
       width:100%;
       color:darkslategrey;
@@ -129,6 +145,17 @@
       border-width: thin;
       border-style: solid;
       padding:3px 0px 3px 3px;
+      margin-bottom: 3px;
+    }
+    input{
+      font-size: large;
+      max-width:100%;
+      color:darkslategrey;
+      border-radius:4px;
+      border-color: #ccc;
+      border-width: thin;
+      border-style: solid;
+      padding:4px 7px 4px 7px;
       margin-bottom: 3px;
     }
     label{
