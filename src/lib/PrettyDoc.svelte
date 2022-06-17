@@ -15,7 +15,7 @@
   <div class = head>
     <div><h3>{document.title}</h3></div>
 
-    <div><p>id: {document.id}</p></div>
+    <!-- <div><p>id: {document.id}</p></div> -->
   </div>
   <div class = guts>
     {#if document.thumbnail_url}
@@ -130,10 +130,6 @@
             text-overflow:ellipsis;
         }
       }
-    }
-    button{
-      width:100%;
-      height:30px;
     }
 
   }

@@ -1,7 +1,5 @@
 <script>
   import {
-    searchByTerm,
-    searchByCategory,
     searchWithParams,
     categories,
     primaryCollections
@@ -12,13 +10,15 @@
   let category=""
   let primary_collection=""
   let text = ""
+  let page = 1
 
   // $:console.log({category,primary_collection,text})
 
   $: searchparams ={
     category,
     primary_collection,
-    text
+    text,
+    page
   }
 
  let updateCollections = (/** @type {any} */ collections)=>{
@@ -34,7 +34,6 @@
 
  const search = async()=>{
   results = searchWithParams(searchparams)
-  console.log(await results)
  }
 
  const enter = (e) => {
@@ -42,9 +41,16 @@
 			search();
 		}
 	};
+  const incrementPage=()=>{
+    page =page+1
+    search()
+  }
+  const decrementPage=()=>{
+    page =page-1
+    search()
+  }
 
 </script>
-
 
 <div class = container>
   <div class = sidebar>
@@ -93,14 +99,20 @@
   </div>
 
   <div class = results>
-    <h1>A list of docs</h1>
-    {#await results then docs}
-      {#each docs.search.results as document}
-       <!-- <DisplayDoc {document}> -->
-       <!-- </DisplayDoc> -->
-       <PrettyDoc {document}></PrettyDoc>
-      {/each}
+    {#await results}
+    <h2>Waiting for search</h2> 
+    {:then docs}
+      {#if page>1}
+        <button on:click={decrementPage}>Previous Page</button>
+      {/if}  
+        {#each docs.search.results as document}
+        <!-- <DisplayDoc {document}> -->
+        <!-- </DisplayDoc> -->
+        <PrettyDoc {document}></PrettyDoc>
+        {/each}
+      <button on:click={incrementPage}>Next Page</button>
     {/await}
+    
   </div>
 </div>
 
@@ -144,7 +156,6 @@
     width:20%;
   }
   .results{
-    overflow-x: scroll;
     flex-basis: 80%;
   }
 }
@@ -185,11 +196,15 @@
       margin-bottom: 3px;
       font-size: small;
     }
-        button{
-      width:100%;
-      height:30px;
-    }
+  
 
   }    
-
+  h2{
+    margin-left: 5px;
+  }
+  button{
+      width:100%;
+      height:30px;
+      margin:10px 0px 10px 0px;
+    }
 </style>

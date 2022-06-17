@@ -49,21 +49,29 @@ const searchWithParams = async (/** @type {object} */ searchparams)=>{
   const defaultparams={
     text:"",
     category:"",
-    primary_collection:""
+    primary_collection:"",
+    page:1
   }
+
+
+  const params = {...defaultparams, ...searchparams}
+
+  let text = `text=${params.text}&page=${params.page}`
+  const sort = "&sort=syndication_date&direction=desc"
+
   const reducer = (/** @type {string} */ accumulator, /** @type {any[]} */ d)=>{
     accumulator =  accumulator ? accumulator : ""
     // console.log(accumulator)
-    if(d[1] && d[0]!='text'){
+    if(d[1] && d[0]!='text' && d[0]!='page'){
       return `${accumulator}&and[${d[0]}][]=${d[1]}`
     }
     return accumulator
   }
 
-  const params = {...defaultparams, ...searchparams}
-  console.log({params})
   let p = Object.entries(params)
-  let searchstring = p.reduce(reducer,`text=${params.text}`)
+  let searchstring = p.reduce(reducer,text+sort)
+
+
   const url = `/api?${searchstring}`
   let resp = fetch(url)
     .then(response => response.json())
