@@ -8,6 +8,7 @@
   let searchparams,incrementPage,decrementPage
 
   let idlist = [] 
+  let selected = {}
 
   const dragstart = (e,document)=>{
    	e.dataTransfer.setData('text/plain', document.id.toString());
@@ -18,15 +19,15 @@
   }
   
   const drop = (e)=>{
-    console.log("drag has stopped")
     e.preventDefault();
     const id = e.dataTransfer.getData("text/plain");
-    console.log({id})
-    idlist=[id,...idlist]
+    selected[id]=searchById(id)
+    // console.log({id})
+    // idlist=[id,...idlist]
   }
 
-  $: doclist = idlist.map(id=>({doc:searchById(id),id}))
-  $: console.log({idlist,doclist})
+  // $: doclist = idlist.map(id=>({doc:searchById(id),id}))
+  // $: console.log({idlist,doclist})
 
 </script>
 
@@ -59,10 +60,21 @@
       </div>
       
   </div>
-  <div class = main 
+  <!-- <div class = main 
     on:drop={drop}
     on:dragover={dragover}>
     {#each doclist as {doc,id}(id)}
+      {#await doc then document}
+        {#if document}
+          <PrettyDoc {document}/>
+        {/if}
+      {/await}
+    {/each}  
+  </div> -->
+  <div class = main 
+    on:drop={drop}
+    on:dragover={dragover}>
+    {#each Object.entries(selected) as [id,doc](id)}
       {#await doc then document}
         {#if document}
           <PrettyDoc {document}/>
