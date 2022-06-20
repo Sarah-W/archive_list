@@ -8,7 +8,6 @@
   export let document = {}
   
   $: datefields = ["created_at", ...Object.keys(document).filter(d=>d.includes("date"))]
-  $:console.log(document)
 
 </script>
 <div class="doc">

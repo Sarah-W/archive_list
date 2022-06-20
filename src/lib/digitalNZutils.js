@@ -28,6 +28,15 @@ const primaryCollections = async (category="",page=0)=>{
   return await resp
 }
 
+const searchById = async(id)=>{
+  if(id){
+    let resp = fetch("api/"+id)
+    .then(response => response.json())
+    .then(d=>d.record)
+    return await resp
+  }
+  await new Promise(()=>{})
+}
 
 const searchByTerm = async (text='cat')=>{
   const url = `api/?text=${text}`
@@ -79,4 +88,4 @@ const searchWithParams = async (/** @type {object} */ searchparams)=>{
 
 }
 
-export {searchWithParams,searchByTerm,searchByCategory,categories,primaryCollections}
+export {searchWithParams,searchByTerm,searchByCategory,categories,primaryCollections,searchById}
