@@ -1,8 +1,8 @@
 <script>
   import Icon,{addIcon} from '@iconify/svelte/dist/OfflineIcon.svelte';
-  import trashIcon from '@iconify-icons/mdi/trash-can-outline';
-  import recycle from '@iconify-icons/mdi/recycle';  
-  import close from '@iconify-icons/mdi/close'; 
+  import trashIcon from '@iconify-icons/mdi/trash-can-outline.js';
+  import recycle from '@iconify-icons/mdi/recycle.js';  
+  import close from '@iconify-icons/mdi/close.js'; 
   import { searchById } from '$lib/digitalNZutils.js'
   import LittleDoc from '$lib/LittleDoc.svelte'
   import PrettyDoc from '$lib/PrettyDoc.svelte'
