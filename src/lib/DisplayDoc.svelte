@@ -6,12 +6,12 @@
   <p>id: {document.id}</p>
 </div>
 {#each Object.entries(document) as entry}
-  {#if entry[1] && entry[1].length && (entry[1]!="Unknown")}
+  <!-- {#if entry[1] && entry[1].length && (entry[1]!="Unknown")} -->
     <div class = entry>
       {entry[0]}:
       {JSON.stringify(entry[1])}
     </div>
-  {/if}  
+  <!-- {/if}   -->
 {/each}
 
 <style lang="scss">

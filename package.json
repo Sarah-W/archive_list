@@ -14,6 +14,8 @@
 		"format": "prettier --write --plugin-search-dir=. ."
 	},
 	"devDependencies": {
+		"@iconify-icons/mdi": "^1.2.19",
+		"@iconify/svelte": "^2.2.1",
 		"@playwright/test": "^1.22.2",
 		"@sveltejs/adapter-auto": "next",
 		"@sveltejs/kit": "next",

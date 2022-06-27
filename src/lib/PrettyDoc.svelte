@@ -7,6 +7,15 @@
 
   export let document = {}
   
+  const _format= (date)=>{
+    try {
+      return format(new Date(document.date[0]),dateformat)
+    } catch {
+      console.log("bad date", date)
+    }
+    return "bad date"
+  }
+
   $: datefields = ["created_at", ...Object.keys(document).filter(d=>d.includes("date"))]
 
 </script>
@@ -26,7 +35,7 @@
       {#if document.display_date}
         <p>Date: {document.display_date}</p>
       {:else if document.date[0]}
-        <p>Date: {format(new Date(document.date),dateformat)}</p>
+        <p>Date: {_format(document.date)}</p>
       {/if}
       {#if document.description}
         <p>Description: {document.description}</p>

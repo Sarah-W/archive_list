@@ -2,25 +2,45 @@
 // @ts-nocheck
 
   import {format} from 'date-fns'
+  import { categories } from '$lib/digitalNZutils'
+  import Icon from '@iconify/svelte/dist/OfflineIcon.svelte';
 
   const dateformat = "d/M/yyyy"
 
   export let document = {}
+  let noImgSource=false
+
+  // $: console.log(noImgSource)
   
+  const _format= (date)=>{
+    try {
+      return format(new Date(document.date[0]),dateformat)
+    } catch {
+      console.log("bad date", date)
+    }
+    return ""
+  }
 </script>
 
   <div class="doc">
-      {#if document.thumbnail_url}
+
+    {#if document.thumbnail_url && !noImgSource}  
       <div class = pic>
-        <img alt={document.title} src={document.thumbnail_url}/>
+        <img alt={document.title} src={document.thumbnail_url} on:error={()=>{noImgSource=true}}/>
       </div>
-      {/if}
+    {:else}
+      <div class = icon>
+        <!-- {console.log(document)} -->
+        <Icon icon ={categories.dict[document.category[0]].icon}  style={"display:block"}/>
+      </div>
+    {/if}
+
       <div class =guts>
         
         {#if document.display_date}
           <p>Date: {document.display_date}</p>
         {:else if document.date[0]}
-          <p>Date: {format(new Date(document.date),dateformat)}</p>
+          <p>Date: {_format(document.date)}</p>
         {/if}
         <a target=_blank href={document.landing_url}>
           <h1>{document.title}</h1>
@@ -33,6 +53,7 @@
 <style lang="scss">
 
   .doc{
+    // position: relative;
     border: solid thin grey;
     display:flex;
     align-items: center;
@@ -48,15 +69,17 @@
       font-size: x-small;
       margin:.2em 0em .2em 0em;
     }
-    .pic{
+  }
+    .pic,.icon{
+      position:relative;
+      min-width: 45px;
       width: 45px;
       height:45px;
       border-radius: 45px;
       margin:5px 0px 5px 5px;
-      border: solid thin grey;
-      background-color: pink;
-
       img{
+        border: solid thin grey;
+        position:absolute;
         display:block;
         object-fit:cover;
         height:45px;
@@ -64,25 +87,34 @@
         width: 45px;
       }
     }
-    .pic:hover{
-      width:fit-content;
-      height:fit-content;
-      border-radius: 45px;
-      margin:5px 0px 5px 5px;
-      border: solid thin grey;
-      background-color: pink;
 
+    .icon{
+      width: 45px;
+      height:45px;
+      display:flex;
+      justify-content: center;
+      align-items: center;
+      background-color: rgb(196, 207, 207);
+      font-size: 35px;
+      color:rgb(67, 64, 73);
+    }
+
+
+    .pic:hover{
+      border-radius: 15px;
+      background-color: none;
       img{
+        z-index: 999;
+        border: solid thin grey;
         display:block;
         height:auto;
         width: auto;
         max-width: 200px;
-        border-radius: 45px;
+        border-radius: 15px;
       }
     }
-  }
+  
   .guts{
-
     border: solid thin rgb(211, 210, 210);
     display:flex;
     flex-direction: column;

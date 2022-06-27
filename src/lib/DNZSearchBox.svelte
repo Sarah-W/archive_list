@@ -8,9 +8,14 @@
   export let results = new Promise(()=>{})
   export let searchparams = {page:1}
 
+  export let showHasDate = true
+  export let hasDate = false
+
   let category=""
   let primary_collection=""
   let text = ""
+  let minYear = "0000"
+  let maxYear = "3000" 
  
 
   // $:console.log({category,primary_collection,text})
@@ -19,8 +24,12 @@
     category,
     primary_collection,
     text,
+    // year:hasDate?`[${minYear}+TO+${maxYear}]`:null,
+    year:hasDate?[minYear,maxYear]:null,
     page:1
   }
+
+
 
  let updateCollections = (/** @type {any} */ collections)=>{
   // if(!collections.find(d=>d==primary_collection)){primary_collection=""}
@@ -62,7 +71,7 @@
             bind:value={category}
           >
           <option value="">All Categories</option>
-            {#each categories as category}
+            {#each categories.list as category}
               <option value={category}>{category}</option>
             {/each}  
           </select>
@@ -81,6 +90,17 @@
           {/await}  
           </select>
         </div>
+        {#if showHasDate}
+          <div class = "checkbox">
+            <input
+              type="checkbox"
+              id="hasdate"
+              bind:checked={hasDate}
+              label="hasdate"
+            />
+            <label for="hasdate">Has date</label>
+          </div>
+        {/if}
         <div class = input>
           <label for="term">Search Term</label>
           <input
@@ -130,12 +150,18 @@
       padding:4px 7px 4px 7px;
       margin-bottom: 3px;
     }
+
+    
     label{
       margin-bottom: 3px;
       font-size: small;
     }
 
-  }    
+  } 
+  .checkbox{
+    margin: 10px 0px 10px 0px;
+    flex-direction: row;
+  }   
 
   button{
       width:100%;
