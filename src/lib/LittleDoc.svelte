@@ -4,6 +4,7 @@
   import {format} from 'date-fns'
   import { categories } from '$lib/digitalNZutils'
   import Icon from '@iconify/svelte/dist/OfflineIcon.svelte';
+  import empty from '@iconify-icons/mdi/circle-small.js';
 
   const dateformat = "d/M/yyyy"
 
@@ -30,8 +31,11 @@
       </div>
     {:else}
       <div class = icon>
-        <!-- {console.log(document)} -->
-        <Icon icon ={categories.dict[document.category[0]].icon}  style={"display:block"}/>
+        {#if document.category[0] && categories.dict[document.category[0]]}
+          <Icon icon ={categories.dict[document.category[0]].icon}  style={"display:block"}/>
+        {:else}
+          <!-- <Icon icon ={empty}  style={"display:block"}/> -->
+        {/if}  
       </div>
     {/if}
 

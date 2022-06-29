@@ -1,33 +1,58 @@
 <script>
-  import Icon,{addIcon} from '@iconify/svelte/dist/OfflineIcon.svelte';
+  import Icon from '@iconify/svelte/dist/OfflineIcon.svelte';
   import trashIcon from '@iconify-icons/mdi/trash-can-outline.js';
   import recycle from '@iconify-icons/mdi/recycle.js';  
-  import close from '@iconify-icons/mdi/close.js'; 
-  import { searchById } from '$lib/digitalNZutils.js'
   import LittleDoc from '$lib/LittleDoc.svelte'
-  import PrettyDoc from '$lib/PrettyDoc.svelte'
   import DnzSearchBox from '../lib/DNZSearchBox.svelte'
+  import { scaleTime } from 'd3-scale'
+  import { extent } from 'd3-array'
+  import { add, addMonths, format, intervalToDuration } from 'date-fns'
+
+  let height = 1000
+  
+  let scale = scaleTime().domain([ addMonths(new Date(),-1),new Date()])
+  let f = "MMMM yyyy"
+
+ $: {
+  scale.range([100,height-100])
+  scale=scale
+}
 
 
-  addIcon("close",close)
 
   let results = new Promise(()=>{})
-  let searchparams,incrementPage,decrementPage
+
+  /**
+* @type {{ page: number; } | undefined}
+*/
+  let searchparams
+  /**
+* @type {svelte.JSX.MouseEventHandler<HTMLButtonElement> | null | undefined}
+*/
+  let incrementPage
+    /**
+* @type {svelte.JSX.MouseEventHandler<HTMLButtonElement> | null | undefined}
+*/
+  let decrementPage
 
   let selected = {}
+  /**
+* @type {any[]}
+*/
   let trashed = []
   let hoveredElement=""
 
-  const isNotTrash = (id,trashed)=>{
+  const isNotTrash = (/** @type {string} */ id,/** @type {string[]} */ trashed)=>{
     return !(trashed.findIndex(d=>d==id) >= 0)
   }
-  const isNotSelected = (id,selected)=>{
+  const isNotSelected = (/** @type {string} */ id,/** @type {{}} */ selected)=>{
     let _selected = Object.keys(selected)
     return !(_selected.findIndex(d=>d==id) >= 0)
   }  
 
-  const dragFromResult = (e,item)=>{
-    const bbox=e.srcElement.getBoundingClientRect()
+  const dragFromResult = (/** @type {DragEvent & { currentTarget: EventTarget & HTMLDivElement; }} */ e,/** @type {{ id: { toString: () => any; }; }} */ item)=>{
+    // @ts-ignore
+    const bbox=e.target.getBoundingClientRect()
     let data={
       fetched:item,
       id:item.id.toString(),
@@ -36,34 +61,53 @@
       x:e.offsetX,
       y:e.offsetY
     }
+   	// @ts-ignore
    	e.dataTransfer.setData('text/plain', JSON.stringify(data));
   }
 
-  const dragFromTimeline = (e,_doc)=>{
+  const dragFromTimeline = (/** @type {DragEvent & { currentTarget: EventTarget & HTMLDivElement; }} */ e,/** @type {any} */ _doc)=>{
     let doc={..._doc}    
     doc.x = e.offsetX
     doc.y = e.offsetY
+   	// @ts-ignore
    	e.dataTransfer.setData('text/plain', JSON.stringify(doc));
   }
 
-  const dragover = (e,element)=>{
+  const dragover = (/** @type {DragEvent & { currentTarget: EventTarget & HTMLDivElement; }} */ e,/** @type {string} */ element)=>{
     e.preventDefault();
     hoveredElement = element
   }
 
-  const drop = (e)=>{
+  const rescale = ()=>{
+    let dateRange = extent(Object.values(selected),(d=>new Date(d.fetched.date[0])))
+    if(dateRange[1]-dateRange[0] < 3e9){// a bit over 1 month
+      scale.domain([dateRange[0],addMonths(dateRange[0],1)])
+    } else{
+      scale.domain(dateRange)
+    }
+    scale=scale
+  }
+
+  const addToTimeline = (/** @type {DragEvent & { currentTarget: EventTarget & HTMLDivElement; }} */e)=>{
     e.preventDefault();
-    e.srcElement.classList.remove("draggedover")
+    // @ts-ignore
+    e.target.classList.remove("draggedover")
+    // @ts-ignore
     let {id,fetched,width,height,x,y} = JSON.parse(e.dataTransfer.getData("text/plain"))
+    // @ts-ignore
     selected[id]={
       id,
       fetched,
       x:e.offsetX-x,
-      y:e.offsetY-y,
+      // y:e.offsetY-y,
+      date:new Date(fetched.date[0]),
       width,
       height
     }
+    rescale()
   }
+
+
 
   const dismiss =(e)=>{
     e.preventDefault();
@@ -71,6 +115,7 @@
     delete selected[id]
     selected=selected
     hoveredElement=""
+    rescale()
   }
 
   const trash =(e)=>{
@@ -80,6 +125,7 @@
     trashed.push(id)
     selected=selected
     hoveredElement=""
+    rescale()
   }
 
 </script>
@@ -94,7 +140,10 @@
       bind:incrementPage={incrementPage}
       bind:decrementPage={decrementPage}/>
       
-      <div class = results>
+      <div class = results
+      on:dragover={(e)=>dragover(e,"")}
+      on:drop={dismiss}
+      >
         {#await results then docs}
           {#if searchparams.page>1}
             <button on:click={decrementPage}>Previous Page</button>
@@ -118,13 +167,23 @@
   </div>
 
   <div class = main
-    on:drop={drop}
+    bind:clientHeight={height}
+    on:drop={addToTimeline}
     on:dragover={dragover}>
     <svg class = timeline height = 1000px width = 100%>
+
+      {#each scale.ticks(3) as scaleTick}
+        <text class = "time"
+          x={100}
+          y={scale(scaleTick)}
+        >
+          {format(scaleTick,f)}
+        </text>
+      {/each} 
       {#each Object.entries(selected) as [id,doc],i (id)}
         <foreignObject 
-          x={doc.x} 
-          y={doc.y} 
+          x={doc.x}
+          y={scale(doc.date)} 
           width={doc.width} 
           height={doc.height+200}
           >
@@ -160,7 +219,8 @@
 
 <style lang="scss">
   svg.timeline{
-    background-color: aquamarine;
+    display:block;
+    background-color: rgb(239, 239, 239);
   }
     div{
       border: solid thin grey;
@@ -181,7 +241,7 @@
   }
   .results{
     overflow-x:auto;
-    height:auto;
+    height:100%;
   }
   .result{
     width:fit-content;
@@ -239,56 +299,10 @@
       margin:10px 0px 10px 0px;
     }
 
-//   @media only screen and (max-width: 500px) {
-//     .container{
-//       display: flex;
-//       flex-direction: column;
-//       width:100%;
-//       margin:5px;
-//     }
-
-//     .sidebar{
-//       width:100%;
-//     }
-//     .main{
-//       overflow-x: scroll;
-//       flex-basis: 100%;
-//     }
-//     button{
-//         width:100%;
-//         height:30px;
-//         margin-top: 15px;
-//       }
-
-//   }
-
-// @media only screen and (min-width: 500px) {
-//   .container{
-//     display:flex;
-//     width:70%;
-//     margin:auto;
-//     flex-direction: row;
-//   }
-
-//     div{
-//       border: solid thin grey;
-//     }
-
-//     .sidebar{
-//       width:30%;
-//     }
-//     .main{
-//       // display:flex;
-//       flex-basis: 70%;
-//     }
-//   }
-
-//   h2{
-//     margin-left: 5px;
-//   }
-//   button{
-//       width:100%;
-//       height:30px;
-//       margin:10px 0px 10px 0px;
-//     }
+  text.time{
+    font-size: 120px;
+    font-family: 'Times New Roman', Times, serif;
+    fill: rgb(206, 202, 202);
+    pointer-events: none;
+  }
 </style>

@@ -12,6 +12,7 @@ import data from '@iconify-icons/mdi/table-large.js';
 import website from '@iconify-icons/mdi/web.js';
 import set from '@iconify-icons/mdi/checkbox-multiple-blank-outline.js';
 
+
 const _categories = [
   {text:"Newspapers", icon:newspaper, index:0},
   {text:"Images", icon:image, index:1},
@@ -29,7 +30,8 @@ const _categories = [
   {text:"Groups", icon:group, index:13},
   {text:"Data", icon:data, index:14},
   {text:"Websites", icon:website, index:15},
-  {text:"Sets", icon:set, index:16}
+  {text:"Sets", icon:set, index:16},
+  // {text:"empty",icon:empty,index:99}
 ]
 
 const categories={
