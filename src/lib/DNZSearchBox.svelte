@@ -112,11 +112,29 @@
           />
         </div>
         <button on:click={search}>Go!</button>
+        <div class=attribution>
+          <p>This website uses data sourced from <a href="http://www.digitalnz.org" target="_blank">DigitalNZ</a>.</p>
+          <div><img alt="" src="/dnz_tall.ai.svg"/></div>
+        </div>
       </fieldset>
     </div>
 
 <style lang="scss">
-
+  .attribution{
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    div{
+      max-width:20%;
+      margin-right: 4px;
+      img{
+        display: block;
+        width: 100%;
+        height:auto;
+      }
+    }
+  }
   fieldset{
       border-radius:4px;
       border-color: #ccc;

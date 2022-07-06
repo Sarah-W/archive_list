@@ -83,7 +83,6 @@ const searchWithParams = async (/** @type {object} */ searchparams)=>{
     page:1
   }
 
-
   const params = {...defaultparams, ...searchparams}
 
   let text = `text=${params.text}&page=${params.page}`

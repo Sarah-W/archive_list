@@ -6,17 +6,17 @@
   import DnzSearchBox from '../lib/DNZSearchBox.svelte'
   import { scaleTime } from 'd3-scale'
   import { extent } from 'd3-array'
-  import { add, addMonths, format, intervalToDuration } from 'date-fns'
+  import { addMonths, format } from 'date-fns'
 
   let height = 1000
   
   let scale = scaleTime().domain([ addMonths(new Date(),-1),new Date()])
-  let f = "MMMM yyyy"
+  let f = "dd MMMM yyyy"
 
  $: {
   scale.range([100,height-100])
   scale=scale
-}
+  }
 
 
 
@@ -88,8 +88,9 @@
     scale=scale
   }
 
-  const addToTimeline = (/** @type {DragEvent & { currentTarget: EventTarget & HTMLDivElement; }} */e)=>{
+  const addToTimeline = (/** @type {DragEvent & { currentTarget: EventTarget & HTMLDivElement; }} */e,currentX=0)=>{
     e.preventDefault();
+    e.stopPropagation()
     // @ts-ignore
     e.target.classList.remove("draggedover")
     // @ts-ignore
@@ -98,16 +99,13 @@
     selected[id]={
       id,
       fetched,
-      x:e.offsetX-x,
-      // y:e.offsetY-y,
+      x:e.offsetX+currentX-x,
       date:new Date(fetched.date[0]),
       width,
       height
     }
     rescale()
   }
-
-
 
   const dismiss =(e)=>{
     e.preventDefault();
@@ -169,7 +167,8 @@
   <div class = main
     bind:clientHeight={height}
     on:drop={addToTimeline}
-    on:dragover={dragover}>
+    on:dragover={dragover}
+    >
     <svg class = timeline height = 1000px width = 100%>
 
       {#each scale.ticks(3) as scaleTick}
@@ -180,21 +179,23 @@
           {format(scaleTick,f)}
         </text>
       {/each} 
-      {#each Object.entries(selected) as [id,doc],i (id)}
+
+      {#each Object.values(selected) as doc (doc.id)}
         <foreignObject 
           x={doc.x}
-          y={scale(doc.date)} 
+          y={scale(doc.date)-doc.height/2} 
           width={doc.width} 
-          height={doc.height+200}
+          height={doc.height}
           >
           <div class = result
           draggable=true 
-          on:dragstart={e=>dragFromTimeline(e,doc)} 
+          on:dragstart={e=>dragFromTimeline(e,doc)}
+          on:drop={e=>{addToTimeline(e,doc.x)}} 
           >
             <LittleDoc document={doc.fetched}/>
           </div>
         </foreignObject>    
-      {/each} 
+      {/each}
     </svg> 
   </div>
 </div>
@@ -245,9 +246,11 @@
   }
   .result{
     width:fit-content;
-    border:none
+    border:none;
+    // background-color:white;
   }
   .main{
+    position: relative;
     overflow-x:auto
   }
 
@@ -298,11 +301,14 @@
       height:30px;
       margin:10px 0px 10px 0px;
     }
-
+foreignObject{
+  overflow:visible;
+}
   text.time{
-    font-size: 120px;
+    font-size: 20px;
     font-family: 'Times New Roman', Times, serif;
     fill: rgb(206, 202, 202);
     pointer-events: none;
+    user-select: none; 
   }
 </style>

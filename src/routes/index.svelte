@@ -28,7 +28,7 @@
         {#each docs.search.results as document}
           <LittleDoc {document} />
           <PrettyDoc {document}></PrettyDoc>
-          <!-- <DisplayDoc {document}></DisplayDoc>         -->
+          <DisplayDoc {document}></DisplayDoc>        
         {/each}
       <button on:click={incrementPage}>Next Page</button>
     {/await}

@@ -4,7 +4,7 @@
   import {format} from 'date-fns'
   import { categories } from '$lib/digitalNZutils'
   import Icon from '@iconify/svelte/dist/OfflineIcon.svelte';
-  import empty from '@iconify-icons/mdi/circle-small.js';
+  export let color = "white"
 
   const dateformat = "d/M/yyyy"
 
@@ -23,7 +23,7 @@
   }
 </script>
 
-  <div class="doc">
+  <div class="doc" style:background-color={color}>
 
     {#if document.thumbnail_url && !noImgSource}  
       <div class = pic>
@@ -40,12 +40,14 @@
     {/if}
 
       <div class =guts>
-        
-        {#if document.display_date}
-          <p>Date: {document.display_date}</p>
-        {:else if document.date[0]}
-          <p>Date: {_format(document.date)}</p>
-        {/if}
+        <div class=header>
+          {#if document.display_date}
+            <p>{document.display_date}</p>
+          {:else if document.date[0]}
+            <p>{_format(document.date)}</p>
+          {/if}
+          <p>{document.content_partner[0]}</p>
+        </div>
         <a target=_blank href={document.landing_url}>
           <h1>{document.title}</h1>
         </a>
@@ -55,6 +57,11 @@
 
 
 <style lang="scss">
+  .popout{
+    position:fixed;
+    left:0;
+    top:0;
+  }
 
   .doc{
     // position: relative;
@@ -119,12 +126,17 @@
     }
   
   .guts{
-    border: solid thin rgb(211, 210, 210);
+    // border: solid thin rgb(211, 210, 210);
     display:flex;
     flex-direction: column;
     margin:5px;
     padding:5px;
     border-radius: 40px;
+    .header{
+      display:flex;
+      flex-direction: row;
+      gap:10px;
+    }
   }
 
   // @media only screen and (max-width: 500px) {
