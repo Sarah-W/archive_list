@@ -9,8 +9,7 @@
   import { scaleTime } from 'd3-scale'
   import { extent } from 'd3-array'
   import { addMonths, format } from 'date-fns'
-  import { tweened } from 'svelte/motion';
-	import { cubicOut } from 'svelte/easing';
+  import { fade } from 'svelte/transition';
 
   let height = 1000
   
@@ -184,13 +183,17 @@
     >
     <svg class = timeline height = 1000px width = 100%>
 
-      {#each scale.ticks(3) as scaleTick}
-        <text class = "time"
-          x={100}
-          y={scale(scaleTick)}
+      {#each scale.ticks(3) as scaleTick,i (i)}
+        <g 
+          class = time 
+          style:transform={`translate(100px,${scale(scaleTick)}px`}
+          
         >
+          <text>
           {format(scaleTick,f)}
         </text>
+        </g>
+
       {/each} 
 
       {#each Object.values(selected) as doc (doc.id)}
@@ -304,11 +307,14 @@
 foreignObject{
   overflow:visible;
 }
-  text.time{
-    font-size: 20px;
-    font-family: 'Times New Roman', Times, serif;
-    fill: rgb(206, 202, 202);
-    pointer-events: none;
-    user-select: none; 
+  g.time{
+    transition:transform 1s;
+    text{
+      font-size: 20px;
+      font-family: 'Times New Roman', Times, serif;
+      fill: rgb(206, 202, 202);
+      pointer-events: none;
+      user-select: none;
+    }
   }
 </style>
