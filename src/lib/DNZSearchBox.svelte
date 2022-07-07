@@ -30,7 +30,6 @@
   }
 
 
-
  let updateCollections = (/** @type {any} */ collections)=>{
   // if(!collections.find(d=>d==primary_collection)){primary_collection=""}
   primary_collection=""

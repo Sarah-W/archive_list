@@ -1,4 +1,6 @@
 <script>
+  import TimelineEntry from './TimelineEntry.svelte';
+
   import Icon from '@iconify/svelte/dist/OfflineIcon.svelte';
   import trashIcon from '@iconify-icons/mdi/trash-can-outline.js';
   import recycle from '@iconify-icons/mdi/recycle.js';  
@@ -7,6 +9,8 @@
   import { scaleTime } from 'd3-scale'
   import { extent } from 'd3-array'
   import { addMonths, format } from 'date-fns'
+  import { tweened } from 'svelte/motion';
+	import { cubicOut } from 'svelte/easing';
 
   let height = 1000
   
@@ -71,6 +75,8 @@
     doc.y = e.offsetY
    	// @ts-ignore
    	e.dataTransfer.setData('text/plain', JSON.stringify(doc));
+    // @ts-ignore
+ 
   }
 
   const dragover = (/** @type {DragEvent & { currentTarget: EventTarget & HTMLDivElement; }} */ e,/** @type {string} */ element)=>{
@@ -96,15 +102,22 @@
     // @ts-ignore
     let {id,fetched,width,height,x,y} = JSON.parse(e.dataTransfer.getData("text/plain"))
     // @ts-ignore
+
     selected[id]={
       id,
       fetched,
       x:e.offsetX+currentX-x,
       date:new Date(fetched.date[0]),
+      y:e.offsetY-y,
       width,
       height
-    }
+    }    
     rescale()
+  }
+
+  const caughtDrop=(e)=>{
+    let doc = e.detail
+    selected[doc.id]=doc
   }
 
   const dismiss =(e)=>{
@@ -181,20 +194,7 @@
       {/each} 
 
       {#each Object.values(selected) as doc (doc.id)}
-        <foreignObject 
-          x={doc.x}
-          y={scale(doc.date)-doc.height/2} 
-          width={doc.width} 
-          height={doc.height}
-          >
-          <div class = result
-          draggable=true 
-          on:dragstart={e=>dragFromTimeline(e,doc)}
-          on:drop={e=>{addToTimeline(e,doc.x)}} 
-          >
-            <LittleDoc document={doc.fetched}/>
-          </div>
-        </foreignObject>    
+        <TimelineEntry {doc} {scale} on:caughtDrop={caughtDrop}></TimelineEntry>
       {/each}
     </svg> 
   </div>
