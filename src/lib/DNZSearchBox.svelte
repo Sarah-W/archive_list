@@ -59,8 +59,6 @@
   }
 
 </script>
-
-<div>
       <fieldset>
         <legend>Search DigitalNZ</legend>
         <div class = input>
@@ -116,7 +114,6 @@
           <div><img alt="" src="/dnz_tall.ai.svg"/></div>
         </div>
       </fieldset>
-    </div>
 
 <style lang="scss">
   .attribution{

@@ -8,18 +8,19 @@
   import DnzSearchBox from '../lib/DNZSearchBox.svelte'
   import { scaleTime } from 'd3-scale'
   import { extent } from 'd3-array'
-  import { addMonths, format } from 'date-fns'
+  import { addHours, format } from 'date-fns'
   import { fade } from 'svelte/transition';
 
   let height = 1000
   
-  let scale = scaleTime().domain([ addMonths(new Date(),-1),new Date()])
-  let f = "dd MMMM yyyy"
+  let scale = scaleTime().domain([ addHours(new Date(),-1),new Date()])
+  let f = "h:mmaaa d MMM yyyy"
 
- $: {
-  scale.range([100,height-100])
-  scale=scale
-  }
+  $:console.log(height)
+  $: {
+    scale.range([100,height-100])
+    scale=scale
+    }
 
 
 
@@ -68,15 +69,15 @@
    	e.dataTransfer.setData('text/plain', JSON.stringify(data));
   }
 
-  const dragFromTimeline = (/** @type {DragEvent & { currentTarget: EventTarget & HTMLDivElement; }} */ e,/** @type {any} */ _doc)=>{
-    let doc={..._doc}    
-    doc.x = e.offsetX
-    doc.y = e.offsetY
-   	// @ts-ignore
-   	e.dataTransfer.setData('text/plain', JSON.stringify(doc));
-    // @ts-ignore
+  // const dragFromTimeline = (/** @type {DragEvent & { currentTarget: EventTarget & HTMLDivElement; }} */ e,/** @type {any} */ _doc)=>{
+  //   let doc={..._doc}    
+  //   doc.x = e.offsetX
+  //   doc.y = e.offsetY
+  //  	// @ts-ignore
+  //  	e.dataTransfer.setData('text/plain', JSON.stringify(doc));
+  //   // @ts-ignore
  
-  }
+  // }
 
   const dragover = (/** @type {DragEvent & { currentTarget: EventTarget & HTMLDivElement; }} */ e,/** @type {string} */ element)=>{
     e.preventDefault();
@@ -85,11 +86,33 @@
 
   const rescale = ()=>{
     let dateRange = extent(Object.values(selected),(d=>new Date(d.fetched.date[0])))
-    if(dateRange[1]-dateRange[0] < 3e9){// a bit over 1 month
-      scale.domain([dateRange[0],addMonths(dateRange[0],1)])
-    } else{
-      scale.domain(dateRange)
+    let duration =  dateRange[1]-dateRange[0]
+    switch(true){ 
+      case duration < 3.6e6: //1 hour
+        scale.domain([dateRange[0],addHours(dateRange[0],1)])
+        f = "h:mmaaa d MMM yyyy"
+        break;
+      case duration < 8.64e7: //1 day
+        scale.domain(dateRange)
+        f = "haaa d MMM yyyy"
+        break;
+      case duration < 8.64e8: //10 days
+        scale.domain(dateRange)
+        f = "haaa d MMM yyyy"
+        break;
+      case duration < 3.16e10: //1 year
+        scale.domain(dateRange)
+        f = "d MMM yyyy"
+        break;
+      case duration < 1.58e11: //5 years
+        scale.domain(dateRange)
+        f = "MMMM yyyy"
+        break;
+      default:
+        scale.domain(dateRange)
+        f = "yyyy" 
     }
+    
     scale=scale
   }
 
@@ -140,54 +163,54 @@
 
 </script>
 
-<div class = container>
+<div class = container bind:clientHeight={height}>
   <div class = sidebar>
-    <DnzSearchBox
-      hasDate={true}
-      showHasDate={false} 
-      bind:results={results}
-      bind:searchparams={searchparams} 
-      bind:incrementPage={incrementPage}
-      bind:decrementPage={decrementPage}/>
-      
-      <div class = results
+    <div class = search>
+      <DnzSearchBox
+        hasDate={true}
+        showHasDate={false} 
+        bind:results={results}
+        bind:searchparams={searchparams} 
+        bind:incrementPage={incrementPage}
+        bind:decrementPage={decrementPage}/>
+    </div>
+    <div class = results
       on:dragover={(e)=>dragover(e,"")}
       on:drop={dismiss}
       >
-        {#await results then docs}
-          {#if searchparams.page>1}
-            <button on:click={decrementPage}>Previous Page</button>
-          {/if}  
-            {#each docs.search.results as document}
-              {#if document.date && isNotSelected(document.id,selected) && isNotTrash(document.id,trashed)}
-                <div class = result
-                  draggable=true 
-                  on:dragstart={e=>dragFromResult(e,document)} 
-                  >
-                  <LittleDoc {document} />
-                </div>
-                {/if}
-            {/each}
-    
-          <button on:click={incrementPage}>Next Page</button>
-        {/await}
-        
-      </div>
+      {#await results then docs}
+        {#if searchparams.page>1}
+          <button on:click={decrementPage}>Previous Page</button>
+        {/if}  
+          {#each docs.search.results as document}
+            {#if document.date && isNotSelected(document.id,selected) && isNotTrash(document.id,trashed)}
+              <div class = result
+                draggable=true 
+                on:dragstart={e=>dragFromResult(e,document)} 
+                >
+                <LittleDoc {document} />
+              </div>
+              {/if}
+          {/each}
+  
+        <button on:click={incrementPage}>Next Page</button>
+      {/await}
+    </div>
+
       
   </div>
 
   <div class = main
-    bind:clientHeight={height}
     on:drop={addToTimeline}
     on:dragover={dragover}
     >
-    <svg class = timeline height = 1000px width = 100%>
+    <svg class = timeline height = 100% width = 100%>
 
       {#each scale.ticks(3) as scaleTick,i (i)}
         <g 
           class = time 
           style:transform={`translate(100px,${scale(scaleTick)}px`}
-          
+
         >
           <text>
           {format(scaleTick,f)}
@@ -226,26 +249,32 @@
     display:block;
     background-color: rgb(239, 239, 239);
   }
-    div{
-      border: solid thin grey;
-    }
+  div{
+    // border: solid thin grey;
+  }
 
   .container{
-    height: 98vh;
-    width:80%;
+    height: 91vh;
+    width:90%;
     margin:auto;
     display:grid;
-    grid-template-columns: 30% 70%;
+    grid-template-columns: 20% 60% 20%;
     grid-template-rows: 100%;
+    border: solid thin grey;
   }
   .sidebar{
     display:flex;
     flex-direction: column;
-    height:100%
+    height:100%;
+ 
+  }
+  .search{
+    border: solid thin grey;
   }
   .results{
     overflow-x:auto;
     height:100%;
+    border: solid thin grey;
   }
   .result{
     width:fit-content;
@@ -254,7 +283,8 @@
   }
   .main{
     position: relative;
-    overflow-x:auto
+    overflow-x:auto;
+    border: solid thin grey;
   }
 
   .disposal{
