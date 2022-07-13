@@ -1,10 +1,10 @@
 <script>
   import Icon,{addIcon} from '@iconify/svelte/dist/OfflineIcon.svelte';
   import close from '@iconify-icons/mdi/close.js';
-  import { searchById } from '$lib/digitalNZutils.js'
-  import LittleDoc from '$lib/LittleDoc.svelte'
-  import PrettyDoc from '$lib/PrettyDoc.svelte'
-  import DnzSearchBox from '../lib/DNZSearchBox.svelte'
+  import { searchById } from '$lib/digitalnz/digitalNZutils.js'
+  import LittleDoc from '$lib/digitalnz/LittleDoc.svelte'
+  import PrettyDoc from '$lib/digitalnz/PrettyDoc.svelte'
+  import DnzSearchBox from '../lib/digitalnz/DNZSearchBox.svelte'
 
   addIcon("close",close)
 

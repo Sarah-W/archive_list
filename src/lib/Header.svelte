@@ -1,5 +1,5 @@
 <script>
-  // import User from './User.svelte';
+  import User from './firebase/User.svelte';
 </script>
 
 <nav>
@@ -10,7 +10,7 @@
       </div>
       <div id = middle></div>
       <div id = end >
-        <!-- <User></User> -->
+        <User></User>
       </div>
     </div>
   </div>

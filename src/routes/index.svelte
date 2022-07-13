@@ -1,8 +1,8 @@
 <script>
-  import DisplayDoc from '$lib/DisplayDoc.svelte'
-  import LittleDoc from '$lib/LittleDoc.svelte'
-  import PrettyDoc from '$lib/PrettyDoc.svelte'
-  import DnzSearchBox from '../lib/DNZSearchBox.svelte'
+  import DisplayDoc from '$lib/digitalnz/DisplayDoc.svelte'
+  import LittleDoc from '$lib/digitalnz/LittleDoc.svelte'
+  import PrettyDoc from '$lib/digitalnz/PrettyDoc.svelte'
+  import DnzSearchBox from '../lib/digitalnz/DNZSearchBox.svelte'
 
   let results = new Promise(()=>{})
   let searchparams,incrementPage,decrementPage
