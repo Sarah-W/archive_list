@@ -100,6 +100,8 @@ let password = ""
 
   #login{
     position: relative;
+    z-index: 999;
+    background-color: white;
   }
 
   #login_methods{

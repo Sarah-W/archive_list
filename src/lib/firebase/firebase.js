@@ -135,27 +135,22 @@ async function saveTimeline(name,user,documents,trash){
   }
 }
 
-// async function updateSkirt(oldskirt,skirt,_pieces){
-//   let sk = {...oldskirt.data}
-//   sk.skirt=skirt
-//   sk._pieces = _pieces
-//   await setDoc(doc(db,'skirts',oldskirt.id),{...sk,updatedAt: serverTimestamp()})
-// }
+async function updateTimeline(old,documents,trash){
+  let tl = {...old.data,documents,trash}
 
-// async function deleteSkirt(id){
-//   await deleteDoc(doc(db, "skirts",id))
-//   return "done"
-// }
+  await setDoc(doc(db,'timelines',old.id),{...tl,updatedAt: serverTimestamp()})
+  return old.id
+}
 
-
+async function deleteTimeline(id){
+  await deleteDoc(doc(db, "timelines",id))
+  return "done"
+}
 
 
 const list = writable([])
 
 function loadUserTimelines(usr) {
-
-  console.log(usr)
-
   if (usr){
    const usersTimelinesQuery = query(collection(getFirestore(), 'timelines'), where("user","==",usr.uid), orderBy('createdAt', 'desc'));
     //  const recentMessagesQuery = query(collection(getFirestore(), 'timelines'));
@@ -180,4 +175,4 @@ let onePublicTimeline = (id)=>{
   return oneTimeline  
 }
 
-export {app,signIn,signUserOut,user,saveTimeline,list, onePublicTimeline}//,updateSkirt,deleteSkirt}
+export {app,signIn,signUserOut,user,saveTimeline,list, onePublicTimeline, updateTimeline,deleteTimeline}

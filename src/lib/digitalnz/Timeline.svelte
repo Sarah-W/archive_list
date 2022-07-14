@@ -10,8 +10,7 @@
   import { extent } from 'd3-array'
   import { addHours, format } from 'date-fns'
   import { searchById } from '$lib/digitalnz/digitalNZutils'
-  import { user } from '$lib/firebase/firebase.js'
-  export let startTimeline
+  export let initialTimeline = {}
 
   let height = 1000
   
@@ -153,12 +152,16 @@
     rescale()
   }
 
+  // @ts-ignore
   const retrieveDoc = async ({id,height,width,x,y})=>{
     let fetched = await searchById(id)
     let date = new Date(fetched.date[0])
+    // @ts-ignore
     selected[id]= {id,height,width,x,y,fetched,date}
     rescale()
   }
+
+
 
   const loadTimeline =(/** @type {{ data: { documents: { id: any; height: any; width: any; x: any; y: any; }[]; }; }} */ timeline)=>{
     console.log(timeline)
@@ -169,7 +172,8 @@
     }
   }
 
-  $:  loadTimeline(startTimeline)
+ // @ts-ignore
+  $:  loadTimeline(initialTimeline)
    
 </script>
 
@@ -235,7 +239,8 @@
   <div class = "sidebar right">
     <Save 
       documents={selected} 
-      trashed={trashed}
+      {trashed}
+      {initialTimeline}
       on:load={(e)=>loadTimeline(e.detail)}
     />
   </div>

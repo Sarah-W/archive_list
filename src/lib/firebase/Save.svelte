@@ -1,35 +1,52 @@
 <script>
-  import { user, saveTimeline, list } from '$lib/firebase/firebase'
+  import { user, list, saveTimeline, updateTimeline, deleteTimeline } from '$lib/firebase/firebase'
   import { createEventDispatcher } from 'svelte';
-
+  import { page } from '$app/stores';
+  export let initialTimeline = {}
   const dispatch = createEventDispatcher();
-
   export let documents = {}
-  export let trashed =[]
+  export /**
+* @type {never[]}
+*/
+  let trashed =[]
   let makeNewTimeline = false 
   let newTimelineName = ""
+  let id = ""
   let index ="blank"
+  const findIndex = (id,/** @type {any[]} */ list)=>{
+    console.log("finding index",id,list)
+    const i = list.findIndex(d=>d.id == id)
+    if (i > -1){index=i} else index="blank" 
+  }
+
+  $: id=initialTimeline.id
+  // @ts-ignore
+  $: findIndex(id, $list)
+  $: url = $page.url.href.replace(`/${$page.params?.id}`,"")+"/"+id
 
   const load = ()=>{
-    dispatch("load",$list[index])
+    // @ts-ignore
+    const timeline = $list[index]
+    id=timeline.id
+    dispatch("load",timeline)
     newTimelineName= ""
 	} 
 
 	const save = ()=>{  
     const docs = Object.values(documents).map(({id,height,width,x,y})=>({id,height,width,x,y}))
-    console.log({docs,trashed})
 		saveTimeline(newTimelineName,$user,docs,trashed)
 		makeNewTimeline=false
 	}  
 
-  const update = ()=>{
-		// updateSkirt($skirtlist[skirtindex],_skirt,_pieces)
+  const update = async ()=>{
+    const docs = Object.values(documents).map(({id,height,width,x,y})=>({id,height,width,x,y}))
+		// @ts-ignore
+		id = await updateTimeline($list[index],docs,trashed)
 	}
 
 	const del = ()=>{
-		// deleteSkirt(skirtID).then(load)
+		deleteTimeline(id)
 	}
-
 
 </script>
 
@@ -77,6 +94,11 @@
     <div id=newtimeline class = buttonset>	
       <button  disabled = {false} on:click={()=>{makeNewTimeline = true}}>Save as</button>
     </div>
+  </div>
+
+  <div class=input style:display={index=="blank"?"none":null} >
+    <label for="share">Share this timeline: </label>
+      <input class = input type=text value = {url}/>
   </div>
 
 </fieldset>
