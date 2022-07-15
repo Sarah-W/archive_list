@@ -4,6 +4,8 @@
   import { tweened } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
   import { createEventDispatcher } from 'svelte';
+  import { fade } from 'svelte/transition';
+
   const dispatch = createEventDispatcher()
 
   export let doc 
@@ -64,6 +66,7 @@
           y={$positionY} 
           width={width} 
           height={height}
+          out:fade
           >
           <div class = result
           draggable=true 

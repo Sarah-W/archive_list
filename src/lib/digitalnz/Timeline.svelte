@@ -12,6 +12,7 @@
   import { searchById } from '$lib/digitalnz/digitalNZutils'
   export let initialTimeline = {}
 
+
   let height = 1000
   
   let scale = scaleTime().domain([ addHours(new Date(),-1),new Date()])
@@ -141,6 +142,10 @@
     rescale()
   }
 
+  const dismissAll = ()=>{
+    selected = {}
+  }
+
   const trash =(/** @type {{ preventDefault: () => void; dataTransfer: { getData: (arg0: string) => string; }; }} */ e)=>{
     e.preventDefault();
     let {id} = JSON.parse(e.dataTransfer.getData("text/plain"))
@@ -161,10 +166,7 @@
     rescale()
   }
 
-
-
   const loadTimeline =(/** @type {{ data: { documents: { id: any; height: any; width: any; x: any; y: any; }[]; }; }} */ timeline)=>{
-    console.log(timeline)
     if(timeline.data){
       trashed = timeline.data.trash
       selected={}
@@ -225,7 +227,7 @@
           class = time 
           style:transform={`translate(100px,${scale(scaleTick)}px`}
         >
-          <text>
+          <text dominant-baseline=middle>
           {format(scaleTick,f)}
         </text>
         </g>
@@ -243,34 +245,33 @@
       {initialTimeline}
       on:load={(e)=>loadTimeline(e.detail)}
     />
+    <div class="disposal">
+      <div 
+        class = recycle
+        class:hovering={hoveredElement == "recycle"}
+        on:dragover={(e)=>dragover(e,"recycle")}
+        on:drop={dismiss}
+        on:dblclick={dismissAll}
+        >
+        <Icon icon = {recycle} style={"display:block"}/>
+      </div>
+      <div 
+        class = trash
+        class:hovering={hoveredElement == "trash"}
+        on:dragover={(e)=>dragover(e,"trash")}
+        on:drop={trash}
+        >
+        <Icon icon = {trashIcon} style={"display:block"}/>
+      </div>
+    </div>
   </div>
 </div>
-<div class="disposal">
-  <div 
-    class = recycle
-    class:hovering={hoveredElement == "recycle"}
-    on:dragover={(e)=>dragover(e,"recycle")}
-    on:drop={dismiss}
-    >
-    <Icon icon = {recycle} style={"display:block"}/>
-  </div>
-  <div 
-    class = trash
-    class:hovering={hoveredElement == "trash"}
-    on:dragover={(e)=>dragover(e,"trash")}
-    on:drop={trash}
-    >
-    <Icon icon = {trashIcon} style={"display:block"}/>
-  </div>
-</div>
+
 
 <style lang="scss">
   svg.timeline{
     display:block;
     background-color: rgb(239, 239, 239);
-  }
-  div{
-    // border: solid thin grey;
   }
 
   .container{
@@ -308,11 +309,8 @@
   }
 
   .disposal{
-    position:absolute;
-    right:0;
-    bottom:0;
-    width:fit-content;
     border:none;
+    margin-top: auto;
     .recycle,.trash{
       display:flex;
       flex-direction: row;
@@ -322,7 +320,6 @@
       background-color: grey;
       opacity:15%;
       font-size:100px;
-      width:250px;
       height:110px;
       margin:5px;
     }

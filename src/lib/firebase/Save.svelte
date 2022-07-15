@@ -14,7 +14,6 @@
   let id = ""
   let index ="blank"
   const findIndex = (id,/** @type {any[]} */ list)=>{
-    console.log("finding index",id,list)
     const i = list.findIndex(d=>d.id == id)
     if (i > -1){index=i} else index="blank" 
   }
@@ -53,53 +52,57 @@
 
 <fieldset>
   <legend>Saved Timelines</legend>
-  <div class = input style:display={makeNewTimeline?"none":null}>
-    <label for="timelines">Load a timeline: </label>
-    <select
-      type="select"
-      id="timelines"
-      bind:value={index}
-      on:change={load}
-    >
-      <option value={"blank"}></option>
-      {#each $list as {data,id},i (id)}
-        <option value={i}>{data.name}</option>
-      {/each}
-    </select>
- 
-    <div style:display={makeNewTimeline?"none":null} class = buttonset>
-      <button disabled = {index=="blank"}  on:click={update}>Save</button>	
-      <button disabled = {index=="blank"} on:click={load}>Revert</button>
-      <button disabled = {index=="blank"}  on:click={del}>Delete</button>
+  {#if $user}
+    <div class = input style:display={makeNewTimeline?"none":null}>
+      <label for="timelines">Load a timeline: </label>
+      <select
+        type="select"
+        id="timelines"
+        bind:value={index}
+        on:change={load}
+      >
+        <option value={"blank"}></option>
+        {#each $list as {data,id},i (id)}
+          <option value={i}>{data.name}</option>
+        {/each}
+      </select>
+  
+      <div style:display={makeNewTimeline?"none":null} class = buttonset>
+        <button disabled = {index=="blank"}  on:click={update}>Save</button>	
+        <button disabled = {index=="blank"} on:click={load}>Revert</button>
+        <button disabled = {index=="blank"}  on:click={del}>Delete</button>
+      </div>
     </div>
-  </div>
 
-  <div class = input  style:display={makeNewTimeline?null:"none"} >
-    <label for="timelinename">New timeline name: </label>
-    <input
-      type="text"
-      id="timelinename"
-      bind:value={newTimelineName}
-    />
- 
+    <div class = input  style:display={makeNewTimeline?null:"none"} >
+      <label for="timelinename">New timeline name: </label>
+      <input
+        type="text"
+        id="timelinename"
+        bind:value={newTimelineName}
+      />
+  
 
-    <div class = buttonset style:display={makeNewTimeline?null:"none"}>
-      <button disabled = {!newTimelineName} on:click={save}>Save</button>
-      <button on:click={()=>{makeNewTimeline=false}}>Cancel</button>
+      <div class = buttonset style:display={makeNewTimeline?null:"none"}>
+        <button disabled = {!newTimelineName} on:click={save}>Save</button>
+        <button on:click={()=>{makeNewTimeline=false}}>Cancel</button>
+      </div>
     </div>
-  </div>
 
-  <div class=input style:display={makeNewTimeline?"none":null} >
-    <label for="newtimeline">Or save as a new timeline </label>
-    <div id=newtimeline class = buttonset>	
-      <button  disabled = {false} on:click={()=>{makeNewTimeline = true}}>Save as</button>
+    <div class=input style:display={makeNewTimeline?"none":null} >
+      <label for="newtimeline">Or save as a new timeline </label>
+      <div id=newtimeline class = buttonset>	
+        <button  disabled = {false} on:click={()=>{makeNewTimeline = true}}>Save as</button>
+      </div>
     </div>
-  </div>
 
-  <div class=input style:display={index=="blank"?"none":null} >
-    <label for="share">Share this timeline: </label>
-      <input class = input type=text value = {url}/>
-  </div>
+    <div class=input style:display={index=="blank"?"none":null} >
+      <label for="share">Share this timeline: </label>
+        <input class = input type=text value = {url}/>
+    </div>
+    {:else}
+    <p>Sign in to save, load or share a timeline.</p>
+    {/if}
 
 </fieldset>
 
