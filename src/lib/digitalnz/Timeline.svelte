@@ -1,5 +1,6 @@
 <script>
   import TimelineEntry from '$lib/digitalnz/TimelineEntry.svelte';
+  import Presentation from '$lib/Presentation.svelte';
   import Icon from '@iconify/svelte/dist/OfflineIcon.svelte';
   import trashIcon from '@iconify-icons/mdi/trash-can-outline.js';
   import recycle from '@iconify-icons/mdi/recycle.js';  
@@ -12,16 +13,24 @@
   import { searchById } from '$lib/digitalnz/digitalNZutils'
   export let initialTimeline = {}
 
-
+  let backgroundColor = "#efefef"
+  let textColor = "#cecece"
+  let fontSize = 20
+  let nTicks = 4
+  let fontFamily =  "'Times New Roman', Times, serif"
+  let ffName = "Serif"
+  
   let height = 1000
   
   let scale = scaleTime().domain([ addHours(new Date(),-1),new Date()])
   let f = "h:mmaaa d MMM yyyy"
 
   $: {
-    scale.range([100,height-100])
+    scale.range([50,height-100])
     scale=scale
     }
+  
+  $: style = {backgroundColor,textColor,fontFamily,fontSize,nTicks,ffName}  
 
   let results = new Promise(()=>{})
 
@@ -144,6 +153,7 @@
 
   const dismissAll = ()=>{
     selected = {}
+    rescale()
   }
 
   const trash =(/** @type {{ preventDefault: () => void; dataTransfer: { getData: (arg0: string) => string; }; }} */ e)=>{
@@ -166,10 +176,21 @@
     rescale()
   }
 
-  const loadTimeline =(/** @type {{ data: { documents: { id: any; height: any; width: any; x: any; y: any; }[]; }; }} */ timeline)=>{
+  const loadTimeline =(/** @type {{ data?: any; }} */ timeline)=>{
     if(timeline.data){
       trashed = timeline.data.trash
       selected={}
+      if(timeline.data.style){
+        ({backgroundColor,textColor,fontFamily,fontSize,nTicks,ffName} = timeline.data.style)
+        console.log(timeline.data.style)
+      } else {//reset to defaults
+        backgroundColor = "#efefef"
+        textColor = "#cecece"
+        fontSize = 20
+        nTicks = 4
+        fontFamily =  "'Times New Roman', Times, serif"
+        ffName = "Serif"
+      }
       timeline.data.documents.forEach(retrieveDoc)
     }
   }
@@ -220,12 +241,15 @@
     on:drop={addToTimeline}
     on:dragover={dragover}
     >
-    <svg class = timeline height = 100% width = 100%>
+    <svg class = timeline style:background-color={backgroundColor} height = 100% width = 100%>
 
-      {#each scale.ticks(3) as scaleTick,i (i)}
+      {#each scale.ticks(nTicks) as scaleTick,i (i)}
         <g 
           class = time 
           style:transform={`translate(100px,${scale(scaleTick)}px`}
+          style:fill={textColor}
+          style:font-size={fontSize}
+          style:font-family={fontFamily}
         >
           <text dominant-baseline=middle>
           {format(scaleTick,f)}
@@ -243,7 +267,16 @@
       documents={selected} 
       {trashed}
       {initialTimeline}
+      {style}
       on:load={(e)=>loadTimeline(e.detail)}
+    />
+    <Presentation
+      bind:backgroundColor={backgroundColor}
+      bind:textColor={textColor}
+      bind:fontSize={fontSize}
+      bind:nTicks={nTicks}
+      bind:fontFamily={fontFamily}
+      bind:ffName={ffName}
     />
     <div class="disposal">
       <div 
@@ -271,7 +304,6 @@
 <style lang="scss">
   svg.timeline{
     display:block;
-    background-color: rgb(239, 239, 239);
   }
 
   .container{
@@ -357,9 +389,7 @@ foreignObject{
   g.time{
     transition:transform 1s;
     text{
-      font-size: 20px;
-      font-family: 'Times New Roman', Times, serif;
-      fill: rgb(206, 202, 202);
+      // font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       pointer-events: none;
       user-select: none;
     }

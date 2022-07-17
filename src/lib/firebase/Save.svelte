@@ -5,6 +5,7 @@
   export let initialTimeline = {}
   const dispatch = createEventDispatcher();
   export let documents = {}
+  export let style = {}
   export /**
 * @type {never[]}
 */
@@ -33,14 +34,14 @@
 
 	const save = ()=>{  
     const docs = Object.values(documents).map(({id,height,width,x,y})=>({id,height,width,x,y}))
-		saveTimeline(newTimelineName,$user,docs,trashed)
+		saveTimeline(newTimelineName,$user,docs,trashed,style)
 		makeNewTimeline=false
 	}  
 
   const update = async ()=>{
     const docs = Object.values(documents).map(({id,height,width,x,y})=>({id,height,width,x,y}))
 		// @ts-ignore
-		id = await updateTimeline($list[index],docs,trashed)
+		id = await updateTimeline($list[index],docs,trashed,style)
 	}
 
 	const del = ()=>{
