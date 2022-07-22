@@ -177,7 +177,8 @@
   }
 
   const loadTimeline =(/** @type {{ data?: any; }} */ timeline)=>{
-    if(timeline.data){
+    console.log(timeline)
+    if(timeline?.data){
       trashed = timeline.data.trash
       selected={}
       if(timeline.data.style){
@@ -192,6 +193,16 @@
         ffName = "Serif"
       }
       timeline.data.documents.forEach(retrieveDoc)
+    } else {//timeline undefined, reset all the things.
+      selected = {}
+      trashed = []
+      backgroundColor = "#efefef"
+      textColor = "#cecece"
+      fontSize = 20
+      nTicks = 4
+      fontFamily =  "'Times New Roman', Times, serif"
+      ffName = "Serif"
+      rescale()
     }
   }
 

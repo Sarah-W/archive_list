@@ -1,4 +1,6 @@
 <script>
+// @ts-nocheck
+
   import { user, list, saveTimeline, updateTimeline, deleteTimeline } from '$lib/firebase/firebase'
   import { createEventDispatcher } from 'svelte';
   import { page } from '$app/stores';
@@ -27,7 +29,7 @@
   const load = ()=>{
     // @ts-ignore
     const timeline = $list[index]
-    id=timeline.id
+    id=timeline? timeline.id : null
     dispatch("load",timeline)
     newTimelineName= ""
 	} 
@@ -62,7 +64,7 @@
         bind:value={index}
         on:change={load}
       >
-        <option value={"blank"}></option>
+        <option value={"blank"}>&lt;new timeline&gt;</option>
         {#each $list as {data,id},i (id)}
           <option value={i}>{data.name}</option>
         {/each}
