@@ -118,7 +118,7 @@ function signUserOut() {
   signOut(getAuth());
 }
 
-async function saveTimeline(name,user,documents,trash,style){
+async function saveTimeline(name,user,documents,trash,style,published){
   // Add a new message entry to the Firebase database.
   try {
     await addDoc(collection(getFirestore(), 'timelines'), {
@@ -127,6 +127,7 @@ async function saveTimeline(name,user,documents,trash,style){
       documents,
       trash,
       style,
+      published,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
@@ -136,8 +137,8 @@ async function saveTimeline(name,user,documents,trash,style){
   }
 }
 
-async function updateTimeline(old,documents,trash,style){
-  let tl = {...old.data,documents,trash,style}
+async function updateTimeline(old,documents,trash,style,published){
+  let tl = {...old.data,documents,trash,style,published}
 
   await setDoc(doc(db,'timelines',old.id),{...tl,updatedAt: serverTimestamp()})
   return old.id
