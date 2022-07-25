@@ -15,7 +15,7 @@
   }
 
 $: fontFamily=fontDictionary[ffName]
-$: console.log(ffName)
+
 
 </script>
 

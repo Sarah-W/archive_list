@@ -11,11 +11,13 @@
   export /**
 * @type {never[]}
 */
+  let isPublic = false
   let trashed =[]
   let makeNewTimeline = false 
   let newTimelineName = ""
   let id = ""
   let index ="blank"
+
   const findIndex = (id,/** @type {any[]} */ list)=>{
     const i = list.findIndex(d=>d.id == id)
     if (i > -1){index=i} else index="blank" 
@@ -36,19 +38,29 @@
 
 	const save = ()=>{  
     const docs = Object.values(documents).map(({id,height,width,x,y})=>({id,height,width,x,y}))
-		saveTimeline(newTimelineName,$user,docs,trashed,style)
+		saveTimeline(newTimelineName,$user,docs,trashed,style,false)
 		makeNewTimeline=false
 	}  
 
   const update = async ()=>{
     const docs = Object.values(documents).map(({id,height,width,x,y})=>({id,height,width,x,y}))
-		// @ts-ignore
-		id = await updateTimeline($list[index],docs,trashed,style)
+		let published = !!($list[index].data.published)
+    // @ts-ignore
+		id = await updateTimeline($list[index],docs,trashed,style,published)
 	}
+
+  const togglePublish = async ()=>{
+    let published = !($list[index].data.published)
+    const docs = Object.values(documents).map(({id,height,width,x,y})=>({id,height,width,x,y}))
+    id = await updateTimeline($list[index],docs,trashed,style, published)
+  }
 
 	const del = ()=>{
 		deleteTimeline(id)
+    dispatch("load",null)
 	}
+
+
 
 </script>
 
@@ -71,8 +83,9 @@
       </select>
   
       <div style:display={makeNewTimeline?"none":null} class = buttonset>
-        <button disabled = {index=="blank"}  on:click={update}>Save</button>	
-        <button disabled = {index=="blank"} on:click={load}>Revert</button>
+        <button disabled = {index=="blank"}  on:click={update}>Save</button>
+        <button disabled = {index=="blank"}  on:click={togglePublish}>{$list[index]?.data.published ?"Unpublish":"Publish"}</button>	
+        <button disabled = {index=="blank"}  on:click={load}>Revert</button>
         <button disabled = {index=="blank"}  on:click={del}>Delete</button>
       </div>
     </div>
@@ -99,9 +112,9 @@
       </div>
     </div>
 
-    <div class=input style:display={index=="blank"?"none":null} >
+    <div class=input style:display={$list[index]?.data.published ?null:"none"} >
       <label for="share">Share this timeline: </label>
-        <input class = input type=text value = {url}/>
+        <input id = share class = input type=text value = {url}/>
     </div>
     {:else}
     <p>Sign in to save, load or share a timeline.</p>
@@ -155,14 +168,21 @@
       padding:4px 7px 4px 7px;
       margin-bottom: 3px;
     }
-
-    
     label{
       margin-bottom: 3px;
       font-size: small;
     }
-
   } 
+  div.checkbox{
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 3px;
+    gap:2px;
+    input{
+      margin-left:0px;
+      margin-top:0px;
+    }
+  }
  
 
   button{

@@ -11,7 +11,7 @@
   import { extent } from 'd3-array'
   import { addHours, format } from 'date-fns'
   import { searchById } from '$lib/digitalnz/digitalNZutils'
-  export let initialTimeline = {}
+  export let initialTimeline 
 
   let backgroundColor = "#efefef"
   let textColor = "#cecece"
@@ -151,6 +151,18 @@
     rescale()
   }
 
+  const resetStyle = ()=>{
+    selected = {}
+    trashed = []
+    backgroundColor = "#efefef"
+    textColor = "#cecece"
+    fontSize = 20
+    nTicks = 4
+    fontFamily =  "'Times New Roman', Times, serif"
+    ffName = "Serif"
+    rescale()
+  }
+
   const dismissAll = ()=>{
     selected = {}
     rescale()
@@ -177,13 +189,12 @@
   }
 
   const loadTimeline =(/** @type {{ data?: any; }} */ timeline)=>{
-    console.log(timeline)
+  
     if(timeline?.data){
       trashed = timeline.data.trash
       selected={}
       if(timeline.data.style){
         ({backgroundColor,textColor,fontFamily,fontSize,nTicks,ffName} = timeline.data.style)
-        console.log(timeline.data.style)
       } else {//reset to defaults
         backgroundColor = "#efefef"
         textColor = "#cecece"
@@ -194,20 +205,11 @@
       }
       timeline.data.documents.forEach(retrieveDoc)
     } else {//timeline undefined, reset all the things.
-      selected = {}
-      trashed = []
-      backgroundColor = "#efefef"
-      textColor = "#cecece"
-      fontSize = 20
-      nTicks = 4
-      fontFamily =  "'Times New Roman', Times, serif"
-      ffName = "Serif"
-      rescale()
+      resetStyle()
     }
   }
 
- // @ts-ignore
-  $:  loadTimeline(initialTimeline)
+$: loadTimeline(initialTimeline)
    
 </script>
 
