@@ -11,7 +11,7 @@
   import { extent } from 'd3-array'
   import { addHours, format } from 'date-fns'
   import { searchById } from '$lib/digitalnz/digitalNZutils'
-  export let initialTimeline = {}
+  export let initialTimeline 
 
   let backgroundColor = "#efefef"
   let textColor = "#cecece"
@@ -209,7 +209,7 @@
     }
   }
 
-loadTimeline(null)
+$: loadTimeline(initialTimeline)
    
 </script>
 

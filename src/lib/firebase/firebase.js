@@ -26,6 +26,7 @@ import {
   deleteDoc,
   doc,
   serverTimestamp,
+  documentId,
 } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -155,10 +156,8 @@ const list = writable([])
 function loadUserTimelines(usr) {
   if (usr){
    const usersTimelinesQuery = query(collection(getFirestore(), 'timelines'), where("user","==",usr.uid), orderBy('createdAt', 'desc'));
-    //  const recentMessagesQuery = query(collection(getFirestore(), 'timelines'));
     // Start listening to the query.
     return onSnapshot(usersTimelinesQuery, function(snapshot) {
-      // console.log(snapshot.docs.map(x=>({data:x.data(),id:x.id})))
       // @ts-ignore
       list.set(snapshot.docs.map(x=>({data:x.data(),id:x.id})))
     });
@@ -169,9 +168,10 @@ function loadUserTimelines(usr) {
 userTimelinesUnsubscribe = loadUserTimelines()
 
 let onePublicTimeline = (id)=>{
-  const ref = doc(db, 'timelines',id);
+  const q = query(collection(getFirestore(), 'timelines'), where("published","==",true),where(documentId(),'==',id))
   const oneTimeline = writable({})
-  onSnapshot(ref,(doc)=>{
+  onSnapshot(q,(resp)=>{    
+    const doc = resp.docs[0]
     oneTimeline.set({data:doc.data(),id:doc.id})
     })
   return oneTimeline  

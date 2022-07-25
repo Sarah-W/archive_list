@@ -19,7 +19,6 @@
   let index ="blank"
 
   const findIndex = (id,/** @type {any[]} */ list)=>{
-    console.log("findindex fired")
     const i = list.findIndex(d=>d.id == id)
     if (i > -1){index=i} else index="blank" 
   }
@@ -45,8 +44,9 @@
 
   const update = async ()=>{
     const docs = Object.values(documents).map(({id,height,width,x,y})=>({id,height,width,x,y}))
-		// @ts-ignore
-		id = await updateTimeline($list[index],docs,trashed,style)
+		let published = !!($list[index].data.published)
+    // @ts-ignore
+		id = await updateTimeline($list[index],docs,trashed,style,published)
 	}
 
   const togglePublish = async ()=>{
@@ -60,7 +60,7 @@
     dispatch("load",null)
 	}
 
-// $:console.log(id,index,$list[index]?.data.published)
+
 
 </script>
 
