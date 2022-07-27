@@ -36,9 +36,9 @@
     newTimelineName= ""
 	} 
 
-	const save = ()=>{  
+	const save = async ()=>{  
     const docs = Object.values(documents).map(({id,height,width,x,y})=>({id,height,width,x,y}))
-		saveTimeline(newTimelineName,$user,docs,trashed,style,false)
+		id = await saveTimeline(newTimelineName,$user,docs,trashed,style,false)
 		makeNewTimeline=false
 	}  
 
@@ -60,7 +60,7 @@
     dispatch("load",null)
 	}
 
-
+$:console.log({index})
 
 </script>
 

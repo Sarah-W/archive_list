@@ -51,6 +51,9 @@ const firebaseConfig = {
 
   const user = writable({uid:0})
 
+  /**
+ * @param {any | undefined} u
+ */
   function authStateObserver(u){
     userTimelinesUnsubscribe()
     list.set([])
@@ -69,7 +72,7 @@ signIn.google = async()=> {
   await signInWithPopup(getAuth(), provider);
 }
 
-signIn.newUser = async (email,password)=>{
+signIn.newUser = async (/** @type {string} */ email,/** @type {string} */ password)=>{
   const auth = getAuth();
   createUserWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
@@ -86,7 +89,7 @@ signIn.newUser = async (email,password)=>{
     });
 }
 
-signIn.email = async(email,password)=>{
+signIn.email = async(/** @type {string} */ email,/** @type {string} */ password)=>{
   const auth = getAuth();
   signInWithEmailAndPassword(auth, email, password)
   .then((userCredential) => {
@@ -100,7 +103,7 @@ signIn.email = async(email,password)=>{
   });
 }
 
-signIn.forgotPasswordEmail = async(email)=>{
+signIn.forgotPasswordEmail = async(/** @type {string} */ email)=>{
   const auth = getAuth();
   sendPasswordResetEmail(auth, email)
   .then(() => {
@@ -119,10 +122,18 @@ function signUserOut() {
   signOut(getAuth());
 }
 
+/**
+ * @param {string} name
+ * @param {{ uid: string; }} user
+ * @param {unknown[]} documents
+ * @param {any[]} trash
+ * @param {{}} style
+ * @param {boolean} published
+ */
 async function saveTimeline(name,user,documents,trash,style,published){
   // Add a new message entry to the Firebase database.
   try {
-    await addDoc(collection(getFirestore(), 'timelines'), {
+   let doc= await addDoc(collection(getFirestore(), 'timelines'), {
       user: user.uid,
       name,
       documents,
@@ -132,12 +143,20 @@ async function saveTimeline(name,user,documents,trash,style,published){
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
+    return doc.id
   }
   catch(error) {
     console.error('Error writing new message to Firebase Database', error);
   }
 }
 
+/**
+ * @param {{ data: any; id: string; }} old
+ * @param {unknown[]} documents
+ * @param {any[]} trash
+ * @param {{}} style
+ * @param {boolean} published
+ */
 async function updateTimeline(old,documents,trash,style,published){
   let tl = {...old.data,documents,trash,style,published}
 
@@ -145,6 +164,9 @@ async function updateTimeline(old,documents,trash,style,published){
   return old.id
 }
 
+/**
+ * @param {string} id
+ */
 async function deleteTimeline(id){
   await deleteDoc(doc(db, "timelines",id))
   return "done"
@@ -153,6 +175,9 @@ async function deleteTimeline(id){
 
 const list = writable([])
 
+/**
+ * @param {{ uid: string; } | undefined} [usr]
+ */
 function loadUserTimelines(usr) {
   if (usr){
    const usersTimelinesQuery = query(collection(getFirestore(), 'timelines'), where("user","==",usr.uid), orderBy('createdAt', 'desc'));
@@ -167,7 +192,7 @@ function loadUserTimelines(usr) {
 
 userTimelinesUnsubscribe = loadUserTimelines()
 
-let onePublicTimeline = (id)=>{
+let onePublicTimeline = (/** @type {string} */ id)=>{
   const q = query(collection(getFirestore(), 'timelines'), where("published","==",true),where(documentId(),'==',id))
   const oneTimeline = writable({})
   onSnapshot(q,(resp)=>{    
