@@ -182,10 +182,12 @@
   // @ts-ignore
   const retrieveDoc = async ({id,height,width,x,y})=>{
     let fetched = await searchById(id)
-    let date = new Date(fetched.date[0])
-    // @ts-ignore
-    selected[id]= {id,height,width,x,y,fetched,date}
-    rescale()
+    if(fetched){
+      let date = new Date(fetched.date[0])
+      // @ts-ignore
+      selected[id]= {id,height,width,x,y,fetched,date}
+      rescale()
+    }
   }
 
   const loadTimeline =(/** @type {{ data?: any; }} */ timeline)=>{
