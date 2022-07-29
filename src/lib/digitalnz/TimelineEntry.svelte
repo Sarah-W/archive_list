@@ -73,7 +73,10 @@
           on:dragstart={e=>dragFromTimeline(e,doc)}
           on:drop={e=>addToTimeline(e,x)}
           >
-            <LittleDoc document={doc.fetched}/>
+            <LittleDoc document={doc.fetched}
+              on:hover={(e)=>dispatch("hover",e.detail)}
+              on:unhover={(e)=>dispatch("unhover",e.detail)}
+            />
           </div>
         </foreignObject>    
 
