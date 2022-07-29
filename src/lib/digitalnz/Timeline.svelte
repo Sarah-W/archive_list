@@ -11,6 +11,7 @@
   import { extent } from 'd3-array'
   import { addHours, format } from 'date-fns'
   import { searchById } from '$lib/digitalnz/digitalNZutils'
+  import ThumbDoc from './ThumbDoc.svelte';
   export let initialTimeline 
 
   let backgroundColor = "#efefef"
@@ -26,8 +27,8 @@
   let f = "h:mmaaa d MMM yyyy"
 
   $: {
-    scale.range([50,height-100])
-    scale=scale
+      scale.range([50,height-100])
+      scale=scale
     }
   
   $: style = {backgroundColor,textColor,fontFamily,fontSize,nTicks,ffName}  
@@ -211,8 +212,34 @@
     }
   }
 
-$: loadTimeline(initialTimeline)
-   
+  $: loadTimeline(initialTimeline)
+
+  let hovereddoc = {id:null}
+  
+  const hover = (e)=>{
+    hovereddoc = e.detail
+  }
+
+  const unhover = ()=>{
+    hovereddoc = {id:null}
+  }
+
+  let main
+  let popup
+  
+
+  $:console.log(main?.getBoundingClientRect())
+  
+  const atBottom = (main,popup)=>{
+    let bMain = main?.getBoundingClientRect()
+    let bPop = popup?.getBoundingClientRect()
+    if(bPop?.bottom > bMain?.bottom){
+      hovereddoc.bottom = 20
+    } 
+  }
+
+  $:atBottom(main,popup)
+
 </script>
 
 <div class = container bind:clientHeight={height}>
@@ -240,7 +267,7 @@ $: loadTimeline(initialTimeline)
                 draggable=true 
                 on:dragstart={e=>dragFromResult(e,document)} 
                 >
-                <LittleDoc {document} />
+                <LittleDoc {document}/>
               </div>
               {/if}
           {/each}
@@ -255,6 +282,7 @@ $: loadTimeline(initialTimeline)
   <div class = main
     on:drop={addToTimeline}
     on:dragover={dragover}
+    bind:this={main}
     >
     <svg class = timeline style:background-color={backgroundColor} height = 100% width = 100%>
 
@@ -273,9 +301,33 @@ $: loadTimeline(initialTimeline)
       {/each} 
 
       {#each Object.values(selected) as doc (doc.id)}
-        <TimelineEntry {doc} {scale} on:caughtDrop={caughtDrop}></TimelineEntry>
+        <TimelineEntry {doc} {scale} 
+          on:caughtDrop={caughtDrop}
+          on:hover={hover}
+          on:unhover={unhover} 
+          ></TimelineEntry>
       {/each}
-    </svg> 
+    </svg>
+    
+    {#each Object.values(selected) as doc (doc.id)}
+      {#if doc.id == hovereddoc.id}
+        {#if hovereddoc.bottom}
+          <div class = popup
+            bind:this={popup} 
+            style:bottom={`${hovereddoc.bottom}px`} 
+            style:left={`${hovereddoc.left}px`}>
+            <ThumbDoc document={doc.fetched}></ThumbDoc>
+          </div>
+        {:else}
+          <div class = popup
+            bind:this={popup} 
+            style:top={`${hovereddoc.top}px`} 
+            style:left={`${hovereddoc.left}px`}>
+            <ThumbDoc document={doc.fetched}></ThumbDoc>
+          </div>
+        {/if}
+      {/if}  
+    {/each}
   </div>
   <div class = "sidebar right">
     <Save 
@@ -317,6 +369,15 @@ $: loadTimeline(initialTimeline)
 
 
 <style lang="scss">
+  .popup{
+    display: block;
+    position: fixed;
+    // left:0;
+    // top:0;
+    z-index: 999;
+    pointer-events: none;
+  }
+
   svg.timeline{
     display:block;
   }

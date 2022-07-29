@@ -1,6 +1,6 @@
 <script>
 // @ts-nocheck
-
+  import { createEventDispatcher } from 'svelte';
   import {format} from 'date-fns'
   import { categories } from '$lib/digitalnz/digitalNZutils'
   import Icon from '@iconify/svelte/dist/OfflineIcon.svelte';
@@ -10,6 +10,16 @@
 
   export let document = {}
   let noImgSource=false
+  let dispatch = createEventDispatcher()
+
+  const mouseenterHandler= (e)=>{
+    const bbox = e.target.getBoundingClientRect()
+    dispatch("hover",{id:document.id,left:bbox.left,top:bbox.top})
+  }
+
+  const mouseleaveHandler= ()=>{
+    dispatch("unhover",{})
+  }
 
   // $: console.log(noImgSource)
   
@@ -27,7 +37,12 @@
 
     {#if document.thumbnail_url && !noImgSource}  
       <div class = pic>
-        <img alt={document.title} src={document.thumbnail_url} on:error={()=>{noImgSource=true}}/>
+        <img 
+          alt={document.title} 
+          src={document.thumbnail_url} 
+          on:mouseenter={mouseenterHandler}
+          on:mouseleave={mouseleaveHandler} 
+          on:error={()=>{noImgSource=true}}/>
       </div>
     {:else}
       <div class = icon>
@@ -111,19 +126,19 @@
     }
 
 
-    .pic:hover{
-      border-radius: 15px;
-      background-color: none;
-      img{
-        z-index: 999;
-        border: solid thin grey;
-        display:block;
-        height:auto;
-        width: auto;
-        max-width: 200px;
-        border-radius: 15px;
-      }
-    }
+    // .pic:hover{
+    //   border-radius: 15px;
+    //   background-color: none;
+    //   img{
+    //     z-index: 999;
+    //     border: solid thin grey;
+    //     display:block;
+    //     height:auto;
+    //     width: auto;
+    //     max-width: 200px;
+    //     border-radius: 15px;
+    //   }
+    // }
   
   .guts{
     // border: solid thin rgb(211, 210, 210);

@@ -11,7 +11,6 @@
   export /**
 * @type {never[]}
 */
-  let isPublic = false
   let trashed =[]
   let makeNewTimeline = false 
   let newTimelineName = ""
@@ -59,8 +58,6 @@
 		deleteTimeline(id)
     dispatch("load",null)
 	}
-
-$:console.log({index})
 
 </script>
 
@@ -173,18 +170,7 @@ $:console.log({index})
       font-size: small;
     }
   } 
-  div.checkbox{
-    display: flex;
-    flex-direction: row;
-    margin-bottom: 3px;
-    gap:2px;
-    input{
-      margin-left:0px;
-      margin-top:0px;
-    }
-  }
  
-
   button{
       width:100%;
       height:30px;
