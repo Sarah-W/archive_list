@@ -16,7 +16,6 @@
   $: ({ id, fetched, x, date, y, width, height } = doc)
 
   let positionY
-  // let dateY = scale(date)-height/2
   
   const onUpdateY = (y)=> {
    positionY = tweened(y, {duration: 1000, easing: cubicOut})
