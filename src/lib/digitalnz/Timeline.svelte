@@ -227,9 +227,6 @@
   let main
   let popup
   
-
-  $:console.log(main?.getBoundingClientRect())
-  
   const atBottom = (main,popup)=>{
     let bMain = main?.getBoundingClientRect()
     let bPop = popup?.getBoundingClientRect()
@@ -267,7 +264,7 @@
                 draggable=true 
                 on:dragstart={e=>dragFromResult(e,document)} 
                 >
-                <LittleDoc {document}/>
+                <LittleDoc {document} selfpopup={true}/>
               </div>
               {/if}
           {/each}

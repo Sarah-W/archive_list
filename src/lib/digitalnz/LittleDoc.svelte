@@ -5,6 +5,7 @@
   import { categories } from '$lib/digitalnz/digitalNZutils'
   import Icon from '@iconify/svelte/dist/OfflineIcon.svelte';
   export let color = "white"
+  export let selfpopup = false
 
   const dateformat = "d/M/yyyy"
 
@@ -36,7 +37,7 @@
   <div class="doc" style:background-color={color}>
 
     {#if document.thumbnail_url && !noImgSource}  
-      <div class = pic>
+      <div class = pic class:selfpop={selfpopup}>
         <img 
           alt={document.title} 
           src={document.thumbnail_url} 
@@ -126,19 +127,19 @@
     }
 
 
-    // .pic:hover{
-    //   border-radius: 15px;
-    //   background-color: none;
-    //   img{
-    //     z-index: 999;
-    //     border: solid thin grey;
-    //     display:block;
-    //     height:auto;
-    //     width: auto;
-    //     max-width: 200px;
-    //     border-radius: 15px;
-    //   }
-    // }
+    .selfpop:hover{
+      border-radius: 15px;
+      background-color: none;
+      img{
+        z-index: 999;
+        border: solid thin grey;
+        display:block;
+        height:auto;
+        width: auto;
+        max-width: 200px;
+        border-radius: 15px;
+      }
+    }
   
   .guts{
     // border: solid thin rgb(211, 210, 210);
