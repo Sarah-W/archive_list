@@ -1,88 +1,86 @@
 <script>
-// @ts-nocheck
-  import LittleDoc from '$lib/digitalnz/LittleDoc.svelte'
-  import { tweened } from 'svelte/motion';
+	// @ts-nocheck
+	import LittleDoc from '$lib/digitalnz/LittleDoc.svelte';
+	import { tweened } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
-  import { createEventDispatcher } from 'svelte';
-  import { fade } from 'svelte/transition';
+	import { createEventDispatcher } from 'svelte';
+	import { fade } from 'svelte/transition';
 
-  const dispatch = createEventDispatcher()
+	const dispatch = createEventDispatcher();
 
-  export let doc 
-  export let scale
+	export let doc;
+	export let scale;
 
-  let { id, fetched, x, date, y, width, height } = doc
+	let { id, fetched, x, date, y, width, height } = doc;
 
-  $: ({ id, fetched, x, date, y, width, height } = doc)
+	$: ({ id, fetched, x, date, y, width, height } = doc);
 
-  let positionY
-  
-  const onUpdateY = (y)=> {
-   positionY = tweened(y, {duration: 1000, easing: cubicOut})
-   positionY.set(scale(date)-height/2)
-  }
+	let positionY;
 
-  const onUpdateScale = (scale)=> {
-   positionY.set(scale(date)-height/2)
-  }
+	const onUpdateY = (y) => {
+		positionY = tweened(y, { duration: 1000, easing: cubicOut });
+		positionY.set(scale(date) - height / 2);
+	};
 
-  $:onUpdateY(y)
-  $:onUpdateScale(scale)
+	const onUpdateScale = (scale) => {
+		positionY.set(scale(date) - height / 2);
+	};
 
-  const dragFromTimeline = (/** @type {DragEvent & { currentTarget: EventTarget & HTMLDivElement; }} */ e,/** @type {any} */ _doc)=>{
-    let doc={..._doc}
-    doc.x = e.offsetX
-    doc.y = e.offsetY
-   	// @ts-ignore
-   	e.dataTransfer.setData('text/plain', JSON.stringify(doc));
-    // @ts-ignore
- 
-  }
+	$: onUpdateY(y);
+	$: onUpdateScale(scale);
 
-  const addToTimeline = (/** @type {DragEvent & { currentTarget: EventTarget & HTMLDivElement; }} */e,currentX=0)=>{
-    e.preventDefault();
-    e.stopPropagation()
+	const dragFromTimeline = (
+		/** @type {DragEvent & { currentTarget: EventTarget & HTMLDivElement; }} */ e,
+		/** @type {any} */ _doc
+	) => {
+		let doc = { ..._doc };
+		doc.x = e.offsetX;
+		doc.y = e.offsetY;
+		// @ts-ignore
+		e.dataTransfer.setData('text/plain', JSON.stringify(doc));
+		// @ts-ignore
+	};
 
-    let {id,fetched,width,height,x,y} = JSON.parse(e.dataTransfer.getData("text/plain"))
-    
-    let updatedDoc={
-      id,
-      fetched,
-      x:e.offsetX+currentX-x,
-      date:new Date(fetched.date[0]),
-      y:$positionY-e.offsetY,
-      width,
-      height
-    }    
+	const addToTimeline = (
+		/** @type {DragEvent & { currentTarget: EventTarget & HTMLDivElement; }} */ e,
+		currentX = 0
+	) => {
+		e.preventDefault();
+		e.stopPropagation();
 
-    dispatch("caughtDrop",updatedDoc)
-  }
+		let { id, fetched, width, height, x, y } = JSON.parse(e.dataTransfer.getData('text/plain'));
 
+		let updatedDoc = {
+			id,
+			fetched,
+			x: e.offsetX + currentX - x,
+			date: new Date(fetched.date[0]),
+			y: $positionY - e.offsetY,
+			width,
+			height
+		};
+
+		dispatch('caughtDrop', updatedDoc);
+	};
 </script>
 
-<foreignObject
-          style:x={x}
-          y={$positionY} 
-          width={width} 
-          height={height}
-          out:fade
-          >
-          <div class = result
-          draggable=true 
-          on:dragstart={e=>dragFromTimeline(e,doc)}
-          on:drop={e=>addToTimeline(e,x)}
-          >
-            <LittleDoc document={doc.fetched}
-              on:hover={(e)=>dispatch("hover",e.detail)}
-              on:unhover={(e)=>dispatch("unhover",e.detail)}
-            />
-          </div>
-        </foreignObject>    
+<foreignObject style:x y={$positionY} {width} {height} out:fade>
+	<div
+		class="result"
+		draggable="true"
+		on:dragstart={(e) => dragFromTimeline(e, doc)}
+		on:drop={(e) => addToTimeline(e, x)}
+	>
+		<LittleDoc
+			document={doc.fetched}
+			on:hover={(e) => dispatch('hover', e.detail)}
+			on:unhover={(e) => dispatch('unhover', e.detail)}
+		/>
+	</div>
+</foreignObject>
 
 <style lang="scss">
-
-foreignObject{
-  overflow:visible;
-}
+	foreignObject {
+		overflow: visible;
+	}
 </style>
-
